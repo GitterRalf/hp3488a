@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>hp3488-icon-c.ico</file>
+        <file>Cards/HP3488.ini</file>
+    </qresource>
+    <qresource prefix="/branding">
+        <file alias="logo_g.gif">assets/logo_g.gif</file>
+    </qresource>
+</RCC>
