@@ -10,11 +10,24 @@
 #define IconResource FileOpen(SourcePath + "app.rc")
 #define HP3488AIcon ReadQuoted(FileRead(IconResource))
 #expr FileClose(IconResource)
-#define HP3488AName "HP 3488A Control"
+#ifndef BuildArch
+  #define BuildArch "x64"
+#endif
+#if BuildArch == "x86"
+  #define HP3488AName "HP 3488A Control (32 Bit)"
+  #define DeviceAppId "{{A5D96A0C-C970-5462-A085-DFCC2DBD2DDF}"
+  #define DeviceBuildDir "build-x86"
+#elif BuildArch == "x64"
+  #define HP3488AName "HP 3488A Control"
+  #define DeviceAppId "{{5E805C3E-6686-4C41-A56F-20D3CFD2DA45}"
+  #define DeviceBuildDir "build"
+#else
+  #error BuildArch must be x86 or x64.
+#endif
 #define HP3488AExe "HP3488A.exe"
 
 [Setup]
-AppId={{5E805C3E-6686-4C41-A56F-20D3CFD2DA45}
+AppId={#DeviceAppId}
 AppName={#HP3488AName}
 AppVersion={#HP3488AVersion}
 AppVerName={#HP3488AName} {#HP3488AVersion}
@@ -25,13 +38,17 @@ DefaultDirName={pf}\{#HP3488AName}
 DefaultGroupName={#HP3488AName}
 AllowNoIcons=yes
 PrivilegesRequired=admin
+#if BuildArch == "x64"
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
+#else
+ArchitecturesAllowed=x86 x64
+#endif
 ; Inno 5.3.5 can see modern Windows as 6.2 due to its legacy manifest.
 SetupIconFile={#HP3488AIcon}
 UninstallDisplayIcon={app}\{#HP3488AExe}
 OutputDir=installer
-OutputBaseFilename=HP3488A-Setup-{#HP3488AVersion}-x64
+OutputBaseFilename=HP3488A-Setup-{#HP3488AVersion}-{#BuildArch}
 Compression=lzma
 SolidCompression=yes
 
@@ -44,15 +61,19 @@ Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
 
 [Files]
-Source: "build\{#HP3488AExe}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\*.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\generic\*.dll"; DestDir: "{app}\generic"; Flags: ignoreversion
-Source: "build\iconengines\*.dll"; DestDir: "{app}\iconengines"; Flags: ignoreversion
-Source: "build\imageformats\*.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
-Source: "build\networkinformation\*.dll"; DestDir: "{app}\networkinformation"; Flags: ignoreversion
-Source: "build\platforms\*.dll"; DestDir: "{app}\platforms"; Flags: ignoreversion
-Source: "build\styles\*.dll"; DestDir: "{app}\styles"; Flags: ignoreversion
-Source: "build\tls\*.dll"; DestDir: "{app}\tls"; Flags: ignoreversion
+#if BuildArch == "x86"
+Source: "{#DeviceBuildDir}\qt.conf"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#DeviceBuildDir}\bearer\*.dll"; DestDir: "{app}\bearer"; Flags: ignoreversion skipifsourcedoesntexist
+#endif
+Source: "{#DeviceBuildDir}\{#HP3488AExe}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#DeviceBuildDir}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#DeviceBuildDir}\generic\*.dll"; DestDir: "{app}\generic"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#DeviceBuildDir}\iconengines\*.dll"; DestDir: "{app}\iconengines"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#DeviceBuildDir}\imageformats\*.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#DeviceBuildDir}\networkinformation\*.dll"; DestDir: "{app}\networkinformation"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#DeviceBuildDir}\platforms\*.dll"; DestDir: "{app}\platforms"; Flags: ignoreversion
+Source: "{#DeviceBuildDir}\styles\*.dll"; DestDir: "{app}\styles"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#DeviceBuildDir}\tls\*.dll"; DestDir: "{app}\tls"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 Source: "THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "licenses\*.txt"; DestDir: "{app}\licenses"; Flags: ignoreversion

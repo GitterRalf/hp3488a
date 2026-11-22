@@ -7,6 +7,15 @@
 #include <utility>
 
 namespace {
+QPointF mousePosition(const QMouseEvent *event)
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    return event->localPos();
+#else
+    return event->position();
+#endif
+}
+
 
 constexpr qreal diagramWidth = 680;
 constexpr qreal portStep = 61;
@@ -402,7 +411,7 @@ std::optional<int> CardDiagram::hitAt(const QPointF &point) const
 void CardDiagram::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        pressed = hitAt(event->position());
+        pressed = hitAt(mousePosition(event));
         if (pressed) {
             event->accept();
             return;
@@ -413,7 +422,7 @@ void CardDiagram::mousePressEvent(QMouseEvent *event)
 
 void CardDiagram::mouseMoveEvent(QMouseEvent *event)
 {
-    setCursor(hitAt(event->position()) ? Qt::PointingHandCursor : Qt::ArrowCursor);
+    setCursor(hitAt(mousePosition(event)) ? Qt::PointingHandCursor : Qt::ArrowCursor);
     QWidget::mouseMoveEvent(event);
 }
 
@@ -421,7 +430,7 @@ void CardDiagram::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         const auto down = std::exchange(pressed, std::nullopt);
-        if (const auto clicked = hitAt(event->position()); clicked && clicked == down) {
+        if (const auto clicked = hitAt(mousePosition(event)); clicked && clicked == down) {
             activate(*clicked);
             event->accept();
             return;

@@ -139,7 +139,7 @@ void MainWindow::buildInterface()
         previousBar->deleteLater();
     }
     auto *file = bar->addMenu(tr("&Datei"));
-    file->addAction(tr("&Beenden"), QKeySequence::Quit, this, &QWidget::close);
+    file->addAction(tr("&Beenden"), this, &QWidget::close, QKeySequence::Quit);
     auto *preferences = bar->addMenu(tr("&Einstellungen"));
     connectionAction = preferences->addAction(tr("GPIB-Verbindung …"), this, &MainWindow::editConnection);
     auto *appearance = preferences->addMenu(tr("Darstellung"));
@@ -545,7 +545,7 @@ void MainWindow::buildDigital(QVBoxLayout *layout, bool breadboard)
         setpoint->addWidget(db);
         group->addLayout(setpoint);
         connect(slider, &QSlider::valueChanged, db, &QSpinBox::setValue);
-        connect(db, &QSpinBox::valueChanged, slider, &QSlider::setValue);
+        connect(db, qOverload<int>(&QSpinBox::valueChanged), slider, &QSlider::setValue);
         auto *polarity = new QCheckBox(tr("L0–L5 invertieren"));
         polarity->setChecked(inverted);
         group->addWidget(polarity);
@@ -574,7 +574,7 @@ void MainWindow::buildDigital(QVBoxLayout *layout, bool breadboard)
         const auto update = [preview, output] {
             preview->setText(tr("L0–L5 · 1–32 dB   |   Low Byte %1").arg(portText(output())));
         };
-        connect(db, &QSpinBox::valueChanged, this, update);
+        connect(db, qOverload<int>(&QSpinBox::valueChanged), this, update);
         for (auto *check : {polarity, l6, l7}) {
             connect(check, &QCheckBox::toggled, this, update);
         }
@@ -620,7 +620,7 @@ void MainWindow::buildDigital(QVBoxLayout *layout, bool breadboard)
         value->setRange(0, port->currentData().toInt() == 2 ? 65535 : 255);
     };
     portChanged();
-    connect(port, &QComboBox::currentIndexChanged, this, portChanged);
+    connect(port, qOverload<int>(&QComboBox::currentIndexChanged), this, portChanged);
     fields->addWidget(port, 1);
     fields->addWidget(value);
     controls->addLayout(fields);
@@ -689,7 +689,7 @@ QGroupBox *MainWindow::build33321(const std::optional<int> &highOutput)
     const auto update = [preview, selector] {
         preview->setText(tr("H2–H5 · aktiv Low   |   High Byte %1").arg(portText(selector->currentData().toInt())));
     };
-    connect(selector, &QComboBox::currentIndexChanged, this, update);
+    connect(selector, qOverload<int>(&QComboBox::currentIndexChanged), this, update);
     layout->addWidget(preview);
     layout->addStretch();
     auto *send = new QPushButton(tr("Dämpfung setzen"));

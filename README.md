@@ -10,9 +10,9 @@ Windows-Anwendung für die HP 3488A Schaltzentrale. Sie erkennt die eingesetzten
 
 ## Installation und Verbindung
 
-Das [GitHub-Release](https://github.com/GitterRalf/hp3488a/releases/latest) enthält das Windows-x64-Setup mit den benötigten Qt- und MinGW-Laufzeitdateien. Der Standardordner ist `C:\Programme\HP 3488A Control`. Für den Download ist ein GitHub-Konto mit Zugriff auf das private Repository erforderlich.
+Das [GitHub-Release](https://github.com/GitterRalf/hp3488a/releases/latest) enthält die Windows-Setups für x86 und x64 mit den benötigten Qt- und MinGW-Laufzeitdateien. Der Standardordner für x64 ist `C:\Programme\HP 3488A Control`. Für den Download ist ein GitHub-Konto mit Zugriff auf das private Repository erforderlich.
 
-Für die GPIB-Verbindung den 64-Bit-Treiber NI-488.2 separat installieren. Unter **Einstellungen → GPIB-Verbindung** lassen sich Bus und Geräteadresse ändern. Voreingestellt sind Bus **0** und Adresse **7**.
+Für die GPIB-Verbindung den NI-488.2-Treiber mit Unterstützung für die Programmarchitektur separat installieren. Unter **Einstellungen → GPIB-Verbindung** lassen sich Bus und Geräteadresse ändern. Voreingestellt sind Bus **0** und Adresse **7**.
 
 ## Bedienung
 
@@ -22,13 +22,30 @@ Für die GPIB-Verbindung den 64-Bit-Treiber NI-488.2 separat installieren. Unter
 
 ## Bauen
 
-Benötigt werden ein 64-Bit-Windows-Kit mit Qt 6 einschließlich Widgets, Concurrent, Network und Linguist Tools, CMake ab 3.24 und Ninja.
+Benötigt werden ein Windows-Kit mit Qt 6 für x64 oder Qt 5.15 für x86 einschließlich Widgets, Concurrent, Network und Linguist Tools, CMake ab 3.24 und Ninja.
 
 ~~~powershell
-.\build.ps1
+.\build.ps1                    # x64
+.\build.ps1 -Architecture x86  # x86
 ~~~
 
 Das Skript baut `build\HP3488A.exe` und stellt die Laufzeit-DLLs bereit. Anschließend `HP3488A.iss` mit Inno Setup kompilieren. Es übernimmt die Version aus `CMakeLists.txt` und das Icon aus `app.rc`. Die Setupdatei liegt im Ordner `installer`.
+
+
+### Windows-Architekturen
+
+Die x86-Ausgabe verwendet Qt 5.15.19 mit MinGW 8.1 und hat einen eigenen
+Installationsordner **HP 3488A Control (32 Bit)**. Auf 64-Bit-Windows können beide
+Ausgaben parallel installiert werden. Die x64-Ausgabe verwendet weiterhin
+Qt 6 und ist beim Build der Standard.
+
+Der Build für x86 nutzt `build-x86`, der Build für x64 den Ordner `build`.
+Die Installer entstehen im Projektordner mit folgenden Aufrufen.
+
+```powershell
+ISCC.exe HP3488A.iss
+ISCC.exe /DBuildArch=x86 HP3488A.iss
+```
 
 ## Lizenz
 
