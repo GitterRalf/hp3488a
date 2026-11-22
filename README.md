@@ -2,6 +2,8 @@
 
 Windows-Anwendung für die HP 3488A Schaltzentrale. Sie erkennt die eingesetzten Karten, liest Kanalzustände und steuert Relais, Multiplexer, Schaltmatrix und Digital-I/O je nach Kartentyp.
 
+Die Anwendung ist eine Neuimplementierung der HP 3488A-Steuerung aus dem ursprünglichen Java-Projekt OsciViewer von Ralf Tralow. [OsciViewer auf SourceForge](https://sourceforge.net/projects/osziviewer/)
+
 ## Bildschirmaufnahmen
 
 | Hell | Dunkel |
